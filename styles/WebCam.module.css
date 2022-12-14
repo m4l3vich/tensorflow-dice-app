@@ -28,8 +28,49 @@
   background: var(--surface);
 }
 
-.preview {
+.webCamSetup {
+  padding: var(--spacing-xxlarge) var(--spacing-xlarge);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: var(--spacing-small);
+  border-radius: var(--spacing-small);
+  border: 1px solid var(--stroke);
+  background: var(--surface);
+}
+
+.inlineButton {
+  padding: var(--spacing-xsmall);
+  margin: calc(-1 * var(--spacing-xsmall));
   border-radius: var(--spacing-xsmall);
+  border: 0;
+  background: transparent;
+  color: var(--interactive);
+  font-size: inherit;
+  font-family: inherit;
+  font-weight: bold;
+  text-decoration: underline;
+  cursor: pointer;
+  transition: color 100ms ease;
+}
+
+.inlineButton:hover {
+  color: var(--content);
+}
+
+.sampleImage {
+  position: relative;
+  width: 100%;
+  padding-top: 100%;
+  border-radius: var(--spacing-small);
+  border: 1px solid var(--stroke);
+  background: var(--surface);
+  overflow: hidden;
+}
+
+.preview {
+  border-radius: var(--spacing-small);
   border: 1px solid var(--stroke);
   background: var(--surface);
 }

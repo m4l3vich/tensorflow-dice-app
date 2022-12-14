@@ -5,6 +5,7 @@ import "@tensorflow/tfjs-backend-cpu";
 import * as tf from "@tensorflow/tfjs-core";
 import type { TFLiteModel } from "@tensorflow/tfjs-tflite";
 import { DetectionResult, DetectionResultMetadata } from "../detection-result";
+import Image from "next/image";
 
 const SIZE = 1024;
 
@@ -72,6 +73,7 @@ const MEDIA_STREAM_CONSTRAINTS = {
 export const WebCam = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const videoRef = useRef<HTMLVideoElement>();
+  const imageRef = useRef<HTMLImageElement>(null);
 
   const [detectionModel, setDetectionModel] = useState<TFLiteModel>();
   const [detectionResults, setDetectionResults] = useState<
@@ -79,6 +81,12 @@ export const WebCam = () => {
   >([]);
 
   const [classifierModel, setClassifierModel] = useState<TFLiteModel>();
+
+  const [videoStatus, setVideoStatus] = useState<
+    "enabled" | "disabled" | "sample"
+  >("disabled");
+
+  const [videoStream, setVideoStream] = useState<MediaStream>();
 
   useEffect(() => {
     let active = true;
@@ -108,29 +116,36 @@ export const WebCam = () => {
     }
   }, []);
 
+  useEffect(() => {
+    // This doesn't appear to be cross-browser.
+    navigator.permissions.query({ name: "camera" as any }).then((res) => {
+      if (res.state == "granted") {
+        navigator.mediaDevices
+          .getUserMedia(MEDIA_STREAM_CONSTRAINTS)
+          .then((stream) => {
+            setVideoStream(stream);
+            setVideoStatus("enabled");
+          });
+      }
+    });
+  }, []);
+
   const videoSetupRef = useCallback<RefCallback<HTMLVideoElement>>(
     async (node) => {
-      if (node !== null && node.srcObject === null) {
-        const stream = await navigator.mediaDevices.getUserMedia(
-          MEDIA_STREAM_CONSTRAINTS
-        );
-
-        node.srcObject = stream;
+      if (videoStream && node && !node.srcObject) {
+        node.srcObject = videoStream;
+        node.autoplay = true;
         videoRef.current = node;
       }
     },
-    []
+    [videoStream]
   );
 
   const handleClick = () => {
-    if (
-      canvasRef.current &&
-      videoRef.current &&
-      classifierModel &&
-      detectionModel
-    ) {
+    const sourceMedia = videoRef.current || imageRef.current;
+
+    if (canvasRef.current && sourceMedia && classifierModel && detectionModel) {
       // Capture the current video frame onto the canvas.
-      const sourceMedia = videoRef.current;
       const canvasContext = canvasRef.current.getContext("2d")!;
       canvasContext.drawImage(sourceMedia, 0, 0, SIZE, SIZE);
 
@@ -159,40 +174,114 @@ export const WebCam = () => {
     }
   };
 
+  const handleAllowAccess = async () => {
+    const stream = await navigator.mediaDevices.getUserMedia(
+      MEDIA_STREAM_CONSTRAINTS
+    );
+    setVideoStatus("enabled");
+    setVideoStream(stream);
+  };
+
+  const handleLoadSample = () => {
+    setVideoStatus("sample");
+  };
+
+  const showSidebar = videoStatus === "sample" || videoStatus === "enabled";
+  const renderWebCam = () => {
+    switch (videoStatus) {
+      case "sample":
+        return (
+          <>
+            <div className={styles.sampleImage}>
+              <Image
+                src="/dice-5-1.jpg"
+                alt="dice sample"
+                sizes="1024px"
+                fill
+                ref={imageRef}
+              />
+            </div>
+            <button
+              type="button"
+              onClick={handleClick}
+              className={styles.capture}
+            >
+              Capture
+            </button>
+          </>
+        );
+      case "enabled":
+        return (
+          <>
+            <video
+              ref={videoSetupRef}
+              className={styles.webCam}
+              id="webcam-video"
+            />
+            <button
+              type="button"
+              onClick={handleClick}
+              className={styles.capture}
+            >
+              Capture
+            </button>
+          </>
+        );
+      case "disabled":
+        return (
+          <div className={styles.webCamSetup}>
+            <p>
+              🎥{" "}
+              <button
+                type="button"
+                onClick={handleAllowAccess}
+                className={styles.inlineButton}
+              >
+                Allow access
+              </button>{" "}
+              to your webcam to get started.
+            </p>
+            <p>
+              📷 Or,{" "}
+              <button
+                type="button"
+                onClick={handleLoadSample}
+                className={styles.inlineButton}
+              >
+                load a sample image
+              </button>{" "}
+              to see how it works.
+            </p>
+          </div>
+        );
+      default:
+        const _never: never = videoStatus;
+        break;
+    }
+  };
+
   return (
     <div className={styles.container}>
       <div className={styles.contentContainer}>
-        <div className={styles.webCamContainer}>
-          <video
-            autoPlay
-            ref={videoSetupRef}
-            className={styles.webCam}
-            id="webcam-video"
-          />
-          <button
-            type="button"
-            onClick={handleClick}
-            className={styles.capture}
-          >
-            Capture
-          </button>
-        </div>
-        <div className={styles.previewContainer}>
-          <canvas
-            ref={canvasRef}
-            className={styles.preview}
-            width="1024px"
-            height="1024px"
-          />
-          {detectionResults.map((result, index) => (
-            <DetectionResult
-              result={result}
-              key={index}
-              canvas={canvasRef.current!}
-              classifierModel={classifierModel!}
+        <div className={styles.webCamContainer}>{renderWebCam()}</div>
+        {showSidebar ? (
+          <div className={styles.previewContainer}>
+            <canvas
+              ref={canvasRef}
+              className={styles.preview}
+              width="1024px"
+              height="1024px"
             />
-          ))}
-        </div>
+            {detectionResults.map((result, index) => (
+              <DetectionResult
+                result={result}
+                key={index}
+                canvas={canvasRef.current!}
+                classifierModel={classifierModel!}
+              />
+            ))}
+          </div>
+        ) : null}
       </div>
     </div>
   );

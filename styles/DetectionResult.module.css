@@ -1,7 +1,7 @@
 .container {
   position: relative;
   overflow: hidden;
-  border-radius: var(--spacing-xsmall);
+  border-radius: var(--spacing-small);
   border: 1px solid var(--stroke);
 }
 

@@ -13,6 +13,7 @@
   --surface: #a78d73;
   --stroke: #30241c;
   --content: #fbf9f7;
+  --interactive: #30241c;
 
   /* Typography */
   --font-size-medium: 16px;
@@ -39,4 +40,8 @@ a {
 
 * {
   box-sizing: border-box;
+}
+
+p {
+  margin: 0;
 }
