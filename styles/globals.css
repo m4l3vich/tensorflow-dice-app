@@ -1,9 +1,35 @@
+:root {
+  /* Spacing */
+  --spacing-xxlarge: 45px;
+  --spacing-xlarge: 32px;
+  --spacing-large: 24px;
+  --spacing-medium: 16px;
+  --spacing-small: 12px;
+  --spacing-xsmall: 8px;
+  --spacing-xsmall: 4px;
+  --max-content: 1024px;
+
+  /* Colors */
+  --surface: #a78d73;
+  --stroke: #30241c;
+  --content: #fbf9f7;
+
+  /* Typography */
+  --font-size-medium: 16px;
+  --font-family: "Google Sans", -apple-system, BlinkMacSystemFont, Segoe UI,
+    Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue,
+    sans-serif;
+}
+
 html,
 body {
+  position: relative;
   padding: 0;
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
-    Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+  min-height: 100vh;
+  color: var(--content);
+  font-family: var(--font-family);
+  background: linear-gradient(35deg, #a0896d 0%, #8c7770 100%);
 }
 
 a {
@@ -13,14 +39,4 @@ a {
 
 * {
   box-sizing: border-box;
-}
-
-@media (prefers-color-scheme: dark) {
-  html {
-    color-scheme: dark;
-  }
-  body {
-    color: white;
-    background: black;
-  }
 }

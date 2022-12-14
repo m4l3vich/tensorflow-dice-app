@@ -9,6 +9,9 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@tensorflow/tfjs-backend-cpu": "^4.1.0",
+    "@tensorflow/tfjs-core": "^4.1.0",
+    "@tensorflow/tfjs-tflite": "^0.0.1-alpha.9",
     "@types/node": "18.11.15",
     "@types/react": "18.0.26",
     "@types/react-dom": "18.0.9",

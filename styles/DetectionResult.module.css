@@ -1,0 +1,20 @@
+.container {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--spacing-xsmall);
+  border: 1px solid var(--stroke);
+}
+
+.predictedNumber {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  padding: var(--spacing-xsmall) var(--spacing-small);
+  background: rgba(48, 36, 28, 0.5);
+}
+
+.detection {
+  display: block;
+  width: 100%;
+}

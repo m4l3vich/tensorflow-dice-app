@@ -1,0 +1,61 @@
+.container {
+  margin-bottom: var(--spacing-small);
+}
+
+.contentContainer {
+  display: grid;
+  grid-template-columns: 3fr 1fr;
+  gap: var(--spacing-medium);
+}
+
+.webCamContainer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-small);
+  min-width: 0;
+}
+
+.previewContainer {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  gap: var(--spacing-small);
+}
+
+.webCam {
+  border-radius: var(--spacing-small);
+  border: 1px solid var(--stroke);
+  background: var(--surface);
+}
+
+.preview {
+  border-radius: var(--spacing-xsmall);
+  border: 1px solid var(--stroke);
+  background: var(--surface);
+}
+
+.capture {
+  border: 2px solid var(--stroke);
+  border-radius: var(--spacing-small);
+  padding: var(--spacing-medium);
+  color: var(--content);
+  background: transparent;
+  font-size: var(--font-size-medium);
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 100ms ease, transform 80ms ease-out;
+  outline: none;
+}
+
+.capture:hover {
+  background: var(--surface);
+}
+
+.capture:active {
+  transform: scale(0.99);
+}
+
+.capture:focus-visible {
+  outline: 2px solid var(--stroke);
+  outline-offset: 2px;
+}
