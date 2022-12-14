@@ -15,7 +15,23 @@ export interface DetectionResultMetadata {
   score: number;
 }
 
-const CLASSES = ["five", "four", "one", "six", "three", "two"];
+const CLASSES = [5, 4, 1, 6, 3, 2] as const;
+
+const CLASS_FORMATTED = {
+  1: "one",
+  2: "two",
+  3: "three",
+  4: "four",
+  5: "five",
+  6: "six",
+};
+
+type Class = typeof CLASSES[number];
+
+export interface ClassifierResultMetadata {
+  predicted: Class;
+  actual?: Class;
+}
 
 function classify({
   canvasElement,
@@ -51,12 +67,17 @@ export const DetectionResult = ({
   result,
   canvas,
   classifierModel,
+  classifierResult,
+  setClassifierResult,
 }: {
   result: DetectionResultMetadata;
   canvas: HTMLCanvasElement;
   classifierModel: TFLiteModel;
+  classifierResult?: ClassifierResultMetadata;
+  setClassifierResult(result: ClassifierResultMetadata): void;
 }) => {
-  const [predictedNumber, setPredictedNumber] = useState<string | null>(null);
+  const [predictedNumber, setPredictedNumber] = useState<Class | null>(null);
+  const [wrong, setWrong] = useState(false);
 
   const canvasRef = useCallback<RefCallback<HTMLCanvasElement>>(
     (node) => {
@@ -85,7 +106,11 @@ export const DetectionResult = ({
         const maxIndex = classificationResult.indexOf(
           Math.max(...classificationResult)
         );
-        setPredictedNumber(CLASSES[maxIndex]);
+        const predicted = CLASSES[maxIndex];
+        setPredictedNumber(predicted);
+        setClassifierResult({
+          predicted: predicted,
+        });
       }
     },
     [result, canvas]
@@ -95,10 +120,57 @@ export const DetectionResult = ({
     <div className={styles.container}>
       {predictedNumber ? (
         <span className={styles.predictedNumber}>
-          Predicted value: <strong>{predictedNumber}</strong>
+          Predicted: <strong>{predictedNumber}</strong>
+          {classifierResult?.actual ? (
+            <>
+              , Actual: <strong>{classifierResult.actual}</strong>
+            </>
+          ) : null}
         </span>
       ) : null}
       <canvas ref={canvasRef} className={styles.detection} />
+      {predictedNumber ? (
+        <div className={styles.predictionConfirmationContainer}>
+          {wrong ? (
+            <div>
+              {Object.entries(CLASS_FORMATTED).map(([key, value]) => {
+                return (
+                  <button
+                    type="button"
+                    key={key}
+                    onClick={() => {
+                      setClassifierResult({
+                        predicted: predictedNumber,
+                        actual: Number(key) as Class,
+                      });
+                      setWrong(false);
+                    }}
+                  >
+                    {value}
+                  </button>
+                );
+              })}
+            </div>
+          ) : (
+            <>
+              <button type="button" onClick={() => setWrong(true)}>
+                ❌ Wrong
+              </button>
+              <button
+                type="button"
+                onClick={() =>
+                  setClassifierResult({
+                    predicted: predictedNumber,
+                    actual: predictedNumber,
+                  })
+                }
+              >
+                ✅ Correct
+              </button>
+            </>
+          )}
+        </div>
+      ) : null}
     </div>
   );
 };

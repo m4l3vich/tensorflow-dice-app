@@ -18,3 +18,23 @@
   display: block;
   width: 100%;
 }
+
+.predictionConfirmationContainer {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: var(--spacing-xsmall) var(--spacing-small);
+  background: rgba(48, 36, 28, 0.5);
+  display: flex;
+  justify-content: space-between;
+}
+
+.predictionConfirmationContainer button {
+  background: var(--surface);
+  color: var(--content);
+  border: 1px solid var(--stroke);
+  cursor: pointer;
+  padding: var(--spacing-xsmall) var(--spacing-small);
+  border-radius: var(--spacing-xsmall);
+}

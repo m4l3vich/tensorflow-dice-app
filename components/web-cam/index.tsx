@@ -4,7 +4,11 @@ import styles from "../../styles/WebCam.module.css";
 import "@tensorflow/tfjs-backend-cpu";
 import * as tf from "@tensorflow/tfjs-core";
 import type { TFLiteModel } from "@tensorflow/tfjs-tflite";
-import { DetectionResult, DetectionResultMetadata } from "../detection-result";
+import {
+  ClassifierResultMetadata,
+  DetectionResult,
+  DetectionResultMetadata,
+} from "../detection-result";
 import Image from "next/image";
 
 const SIZE = 1024;
@@ -81,6 +85,23 @@ export const WebCam = () => {
   >([]);
 
   const [classifierModel, setClassifierModel] = useState<TFLiteModel>();
+  const [classifierResults, setClassifierResults] = useState<
+    ClassifierResultMetadata[]
+  >([]);
+  const setClassifierResultsAtIndex = (
+    index: number,
+    result: ClassifierResultMetadata
+  ) => {
+    setClassifierResults((results) => {
+      const newResults = [...results];
+      newResults[index] = result;
+      return newResults;
+    });
+  };
+
+  const hasVerifiedResults =
+    classifierResults.length &&
+    classifierResults.every((result) => !!result.actual);
 
   const [videoStatus, setVideoStatus] = useState<
     "enabled" | "disabled" | "sample"
@@ -272,12 +293,27 @@ export const WebCam = () => {
               width="1024px"
               height="1024px"
             />
+            {hasVerifiedResults ? (
+              <div>
+                Total value:{" "}
+                <strong>
+                  {classifierResults.reduce((previous, result) => {
+                    previous += result.actual!;
+                    return previous;
+                  }, 0)}
+                </strong>
+              </div>
+            ) : null}
             {detectionResults.map((result, index) => (
               <DetectionResult
                 result={result}
                 key={index}
                 canvas={canvasRef.current!}
                 classifierModel={classifierModel!}
+                classifierResult={classifierResults[index]}
+                setClassifierResult={(result) =>
+                  setClassifierResultsAtIndex(index, result)
+                }
               />
             ))}
           </div>
