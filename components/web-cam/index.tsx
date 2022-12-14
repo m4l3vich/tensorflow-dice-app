@@ -79,6 +79,8 @@ export const WebCam = () => {
   const videoRef = useRef<HTMLVideoElement>();
   const imageRef = useRef<HTMLImageElement>(null);
 
+  const [turns, setTurns] = useState<number[]>([]);
+
   const [detectionModel, setDetectionModel] = useState<TFLiteModel>();
   const [detectionResults, setDetectionResults] = useState<
     DetectionResultMetadata[]
@@ -98,6 +100,10 @@ export const WebCam = () => {
       return newResults;
     });
   };
+  const rollTotal = classifierResults.reduce((previous, result) => {
+    previous += result.actual!;
+    return previous;
+  }, 0);
 
   const hasVerifiedResults =
     classifierResults.length &&
@@ -207,6 +213,18 @@ export const WebCam = () => {
     setVideoStatus("sample");
   };
 
+  const handleSaveRoll = () => {
+    setTurns((turns) => [...turns, rollTotal]);
+    setDetectionResults([]);
+    setClassifierResults([]);
+
+    if (canvasRef.current) {
+      const canvas = canvasRef.current;
+      const context = canvas.getContext("2d")!;
+      context.clearRect(0, 0, canvas.width, canvas.height);
+    }
+  };
+
   const showSidebar = videoStatus === "sample" || videoStatus === "enabled";
   const renderWebCam = () => {
     switch (videoStatus) {
@@ -239,13 +257,23 @@ export const WebCam = () => {
               className={styles.webCam}
               id="webcam-video"
             />
-            <button
-              type="button"
-              onClick={handleClick}
-              className={styles.capture}
-            >
-              Capture
-            </button>
+            {hasVerifiedResults ? (
+              <button
+                type="button"
+                onClick={handleSaveRoll}
+                className={styles.capture}
+              >
+                Save roll and next turn
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={handleClick}
+                className={styles.capture}
+              >
+                Capture
+              </button>
+            )}
           </>
         );
       case "disabled":
@@ -295,13 +323,7 @@ export const WebCam = () => {
             />
             {hasVerifiedResults ? (
               <div>
-                Total value:{" "}
-                <strong>
-                  {classifierResults.reduce((previous, result) => {
-                    previous += result.actual!;
-                    return previous;
-                  }, 0)}
-                </strong>
+                Total value: <strong>{rollTotal}</strong>
               </div>
             ) : null}
             {detectionResults.map((result, index) => (
@@ -319,6 +341,13 @@ export const WebCam = () => {
           </div>
         ) : null}
       </div>
+      <ul>
+        {turns.map((turn, index) => (
+          <li key={index}>
+            Roll #{index + 1}: {turn}
+          </li>
+        ))}
+      </ul>
     </div>
   );
 };

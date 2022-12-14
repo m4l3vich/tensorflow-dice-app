@@ -26,7 +26,7 @@ const CLASS_FORMATTED = {
   6: "six",
 };
 
-type Class = typeof CLASSES[number];
+export type Class = typeof CLASSES[number];
 
 export interface ClassifierResultMetadata {
   predicted: Class;
