@@ -4,7 +4,6 @@ export default function Document() {
   return (
     <Html>
       <Head>
-        <title>Catan tracker</title>
         <meta
           name="description"
           content="An app to track Catan dice rolls and rounds"

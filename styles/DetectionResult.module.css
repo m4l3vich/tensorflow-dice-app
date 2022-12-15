@@ -3,7 +3,7 @@
   border: 1px solid var(--stroke);
   background: var(--stroke);
   flex: 1;
-  margin-top: var(--spacing-small);
+  margin-top: var(--spacing-xsmall);
 }
 
 .predictedNumber {

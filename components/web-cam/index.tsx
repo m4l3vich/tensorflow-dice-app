@@ -9,6 +9,7 @@ import {
   DetectionResult,
   DetectionResultMetadata,
 } from "../detection-result";
+import { Die } from "../die";
 
 const WEB_CAM_DIMENSIONS = 1024;
 const DETECTION_MODEL_EXPECTED_DIMENSIONS = 512;
@@ -82,7 +83,9 @@ const MEDIA_STREAM_CONSTRAINTS = {
 export const WebCam = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const videoRef = useRef<HTMLVideoElement>();
-  const [turns, setTurns] = useState<number[]>([]);
+  const [turns, setTurns] = useState<
+    Array<{ total: number; dice: ClassifierResultMetadata[] }>
+  >([]);
 
   const [detectionModel, setDetectionModel] = useState<TFLiteModel>();
   const [detectionResults, setDetectionResults] = useState<
@@ -229,7 +232,10 @@ export const WebCam = () => {
   };
 
   const handleSaveRoll = () => {
-    setTurns((turns) => [...turns, rollTotal]);
+    setTurns((turns) => [
+      ...turns,
+      { total: rollTotal, dice: classifierResults },
+    ]);
     setDetectionResults([]);
     setClassifierResults([]);
 
@@ -290,52 +296,72 @@ export const WebCam = () => {
               onClick={handleCaptureClick}
               className={styles.capture}
             >
-              Capture
+              Capture roll
             </button>
-            <div className={styles.previewContainer}>
-              <canvas
-                ref={canvasRef}
-                className={styles.preview}
-                width="1024px"
-                height="1024px"
-              />
-              {detectionResults.map((result, index) => (
-                <DetectionResult
-                  result={result}
-                  key={index}
-                  canvas={canvasRef.current!}
-                  classifierModel={classifierModel!}
-                  classifierResult={classifierResults[index]}
-                  setClassifierResult={(result) =>
-                    setClassifierResultsAtIndex(index, result)
-                  }
+            <div className={styles.dynamicContent}>
+              {hasClassifierResults ? (
+                <>
+                  <button
+                    type="button"
+                    onClick={handleSaveRoll}
+                    className={styles.save}
+                  >
+                    Save roll
+                  </button>
+                  <p className={styles.totalValue}>
+                    Roll total: <strong>{rollTotal}</strong>
+                  </p>
+                </>
+              ) : null}
+              <div className={styles.previewContainer}>
+                <canvas
+                  ref={canvasRef}
+                  className={styles.preview}
+                  width="1024px"
+                  height="1024px"
                 />
-              ))}
+                {detectionResults.map((result, index) => (
+                  <DetectionResult
+                    result={result}
+                    key={index}
+                    canvas={canvasRef.current!}
+                    classifierModel={classifierModel!}
+                    classifierResult={classifierResults[index]}
+                    setClassifierResult={(result) =>
+                      setClassifierResultsAtIndex(index, result)
+                    }
+                  />
+                ))}
+              </div>
             </div>
-            {hasClassifierResults ? (
-              <>
-                <div>
-                  Total value: <strong>{rollTotal}</strong>
-                </div>
-                <button
-                  type="button"
-                  onClick={handleSaveRoll}
-                  className={styles.capture}
-                >
-                  Save roll and next turn
-                </button>
-              </>
+            {turns.length ? (
+              <div className={styles.turnsContainer}>
+                <h2>History</h2>
+                <ul className={styles.turnsList}>
+                  {[...turns].reverse().map(({ total, dice }, index) => (
+                    <li key={index}>
+                      <h3>Roll #{turns.length - index}</h3>
+                      <div className={styles.turnContent}>
+                        <div className={styles.turnDice}>
+                          {dice.map((die, index) => {
+                            return (
+                              <Die
+                                key={index}
+                                currentValue={die.actual ?? die.predicted}
+                              />
+                            );
+                          })}
+                        </div>
+                        <p>{total}</p>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              </div>
             ) : null}
           </div>
         ) : null}
       </div>
-      <ul>
-        {turns.map((turn, index) => (
-          <li key={index}>
-            Roll #{index + 1}: {turn}
-          </li>
-        ))}
-      </ul>
     </div>
   );
 };

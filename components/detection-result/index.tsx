@@ -2,7 +2,7 @@ import { RefCallback, useCallback, useState } from "react";
 import * as tf from "@tensorflow/tfjs-core";
 import type { TFLiteModel } from "@tensorflow/tfjs-tflite";
 import styles from "../../styles/DetectionResult.module.css";
-import { Die } from "../die";
+import { DieButton } from "../die";
 import { Class, CLASSES } from "../../types";
 
 const SIZE = 1024;
@@ -66,7 +66,6 @@ export const DetectionResult = ({
   setClassifierResult(result: ClassifierResultMetadata): void;
 }) => {
   const [predictedNumber, setPredictedNumber] = useState<Class | null>(null);
-  const [wrong, setWrong] = useState(false);
 
   const canvasRef = useCallback<RefCallback<HTMLCanvasElement>>(
     (node) => {
@@ -109,7 +108,7 @@ export const DetectionResult = ({
     <div className={styles.container}>
       {predictedNumber ? (
         <span className={styles.predictedNumber}>
-          <Die
+          <DieButton
             onClick={(value) =>
               setClassifierResult({
                 predicted: predictedNumber,

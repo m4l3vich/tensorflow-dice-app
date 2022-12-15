@@ -15,10 +15,15 @@
   min-width: 0;
 }
 
-.sidebar {
+.sidebar,
+.dynamicContent {
   display: flex;
   flex-direction: column;
   gap: var(--spacing-medium);
+}
+
+.dynamicContent {
+  min-height: 280px;
 }
 
 .previewContainer {
@@ -67,11 +72,15 @@
   display: none;
 }
 
+.totalValue {
+  font-size: var(--font-size-large);
+}
+
 .capture {
   border: 2px solid var(--stroke);
   padding: var(--spacing-medium);
   color: var(--content);
-  background: transparent;
+  background: var(--surface);
   font-size: var(--font-size-medium);
   font-weight: bold;
   cursor: pointer;
@@ -80,14 +89,89 @@
 }
 
 .capture:hover {
-  background: var(--surface);
+  background: var(--die);
 }
 
 .capture:active {
-  transform: scale(0.99);
+  transform: scale(0.97);
 }
 
 .capture:focus-visible {
   outline: 2px solid var(--stroke);
   outline-offset: 2px;
+}
+
+.save {
+  border: 2px solid var(--stroke);
+  padding: var(--spacing-medium);
+  color: var(--surface);
+  background: var(--content);
+  font-size: var(--font-size-medium);
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 100ms ease, color 100ms ease, transform 80ms ease-out;
+  outline: none;
+}
+
+.save:hover {
+  background: var(--die);
+  color: var(--content);
+}
+
+.save:active {
+  transform: scale(0.97);
+}
+
+.save:focus-visible {
+  outline: 2px solid var(--stroke);
+  outline-offset: 2px;
+}
+
+.turnsContainer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-medium);
+}
+
+.turnsContainer h2 {
+  margin: 0;
+  padding: 0;
+  font-size: var(--font-size-large);
+}
+
+.turnsList {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.turnsList li {
+  padding-bottom: var(--spacing-medium);
+  border-bottom: 6px dotted var(--stroke);
+}
+
+.turnsList li + li {
+  padding-top: var(--spacing-medium);
+}
+
+.turnsList h3 {
+  margin: 0 0 var(--spacing-xsmall);
+  padding: 0;
+  font-size: var(--font-size-small);
+}
+
+.turnContent {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.turnDice {
+  display: flex;
+  gap: var(--spacing-xsmall);
+}
+
+.turnContent p {
+  font-size: var(--font-size-large);
+  font-weight: bold;
 }

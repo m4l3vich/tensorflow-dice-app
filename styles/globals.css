@@ -14,9 +14,12 @@
   --stroke: #30241c;
   --content: #30241c;
   --interactive: #30241c;
+  --die: #f2efde;
 
   /* Typography */
+  --font-size-small: 14px;
   --font-size-medium: 16px;
+  --font-size-large: 19px;
   --font-family: "Google Sans", -apple-system, BlinkMacSystemFont, Segoe UI,
     Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue,
     sans-serif;
