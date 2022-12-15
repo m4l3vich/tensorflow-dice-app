@@ -75,9 +75,7 @@
 }
 
 .preview {
-  border: 1px solid var(--stroke);
-  background: var(--surface);
-  display: none;
+  /* display: none; */
 }
 
 .totalValue {
