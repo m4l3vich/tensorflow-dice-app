@@ -205,6 +205,7 @@ export const WebCam = () => {
       if (videoStream && node && !node.srcObject) {
         node.srcObject = videoStream;
         node.autoplay = true;
+        node.playsInline = true;
         videoRef.current = node;
       }
     },
