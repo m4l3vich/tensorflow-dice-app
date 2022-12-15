@@ -10,9 +10,9 @@
   --max-content: 1024px;
 
   /* Colors */
-  --surface: #a78d73;
+  --surface: #fbf9f7;
   --stroke: #30241c;
-  --content: #fbf9f7;
+  --content: #30241c;
   --interactive: #30241c;
 
   /* Typography */
@@ -30,7 +30,7 @@ body {
   min-height: 100vh;
   color: var(--content);
   font-family: var(--font-family);
-  background: linear-gradient(35deg, #a0896d 0%, #8c7770 100%);
+  background: var(--surface);
 }
 
 a {

@@ -1,40 +1,18 @@
 .container {
   position: relative;
-  overflow: hidden;
-  border-radius: var(--spacing-small);
   border: 1px solid var(--stroke);
+  background: var(--stroke);
+  flex: 1;
+  margin-top: var(--spacing-small);
 }
 
 .predictedNumber {
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  padding: var(--spacing-xsmall) var(--spacing-small);
-  background: rgba(48, 36, 28, 0.5);
+  top: calc(-1 * var(--spacing-small));
+  left: calc(-1 * var(--spacing-small));
 }
 
 .detection {
   display: block;
   width: 100%;
-}
-
-.predictionConfirmationContainer {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  padding: var(--spacing-xsmall) var(--spacing-small);
-  background: rgba(48, 36, 28, 0.5);
-  display: flex;
-  justify-content: space-between;
-}
-
-.predictionConfirmationContainer button {
-  background: var(--surface);
-  color: var(--content);
-  border: 1px solid var(--stroke);
-  cursor: pointer;
-  padding: var(--spacing-xsmall) var(--spacing-small);
-  border-radius: var(--spacing-xsmall);
 }

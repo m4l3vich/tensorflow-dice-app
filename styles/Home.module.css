@@ -1,6 +1,3 @@
-.container {
-}
-
 .main {
   padding: var(--spacing-large) var(--spacing-medium);
   max-width: var(--max-content);

@@ -1,0 +1,93 @@
+.button {
+  --die-face-offset: calc(var(--spacing-xxlarge) / 2);
+
+  display: block;
+  width: var(--spacing-xxlarge);
+  height: var(--spacing-xxlarge);
+  border: 0;
+  padding: 0;
+  background: transparent;
+  cursor: pointer;
+  transform: scale(0.9);
+  perspective: 500px;
+  transition: transform 100ms ease;
+  will-change: transform;
+}
+
+.button:hover {
+  transform: scale(1);
+}
+
+.die {
+  width: 100%;
+  height: 100%;
+  transition: transform 300ms ease;
+  transform-style: preserve-3d;
+}
+
+.face {
+  background: rgba(242, 239, 222, 1);
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  backface-visibility: inherit;
+  box-sizing: border-box;
+  border: 1px solid var(--stroke);
+}
+
+.face svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.rotate1 {
+  transform: rotate(0);
+}
+
+.rotate2 {
+  transform: rotate3d(0, 1, 0, -90deg);
+}
+
+.rotate3 {
+  transform: rotate3d(1, 0, 0, -90deg);
+}
+
+.rotate4 {
+  transform: rotate3d(1, 0, 0, 90deg);
+}
+
+.rotate5 {
+  transform: rotate3d(0, 1, 0, 90deg);
+}
+
+.rotate6 {
+  transform: rotate3d(0, 1, 0, 180deg);
+}
+
+.faceOne {
+  transform: translateZ(var(--die-face-offset));
+}
+
+.faceTwo {
+  transform: rotateY(180deg) translateZ(var(--die-face-offset));
+}
+
+.faceThree {
+  transform: rotateY(90deg) translateZ(var(--die-face-offset));
+}
+
+.faceFour {
+  transform: rotateY(-90deg) translateZ(var(--die-face-offset));
+}
+
+.faceFive {
+  transform: rotateX(90deg) translateZ(var(--die-face-offset));
+}
+
+.faceSix {
+  transform: rotateX(-90deg) translateZ(var(--die-face-offset));
+}

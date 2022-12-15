@@ -4,7 +4,7 @@
 
 .contentContainer {
   display: grid;
-  grid-template-columns: 3fr 1fr;
+  grid-template-columns: 2fr 1fr;
   gap: var(--spacing-medium);
 }
 
@@ -15,15 +15,19 @@
   min-width: 0;
 }
 
-.previewContainer {
+.sidebar {
   display: flex;
   flex-direction: column;
-  min-width: 0;
-  gap: var(--spacing-small);
+  gap: var(--spacing-medium);
+}
+
+.previewContainer {
+  display: flex;
+  align-items: stretch;
+  gap: var(--spacing-medium);
 }
 
 .webCam {
-  border-radius: var(--spacing-small);
   border: 1px solid var(--stroke);
   background: var(--surface);
 }
@@ -35,7 +39,6 @@
   justify-content: center;
   flex-direction: column;
   gap: var(--spacing-small);
-  border-radius: var(--spacing-small);
   border: 1px solid var(--stroke);
   background: var(--surface);
 }
@@ -43,7 +46,6 @@
 .inlineButton {
   padding: var(--spacing-xsmall);
   margin: calc(-1 * var(--spacing-xsmall));
-  border-radius: var(--spacing-xsmall);
   border: 0;
   background: transparent;
   color: var(--interactive);
@@ -59,25 +61,14 @@
   color: var(--content);
 }
 
-.sampleImage {
-  position: relative;
-  width: 100%;
-  padding-top: 100%;
-  border-radius: var(--spacing-small);
-  border: 1px solid var(--stroke);
-  background: var(--surface);
-  overflow: hidden;
-}
-
 .preview {
-  border-radius: var(--spacing-small);
   border: 1px solid var(--stroke);
   background: var(--surface);
+  display: none;
 }
 
 .capture {
   border: 2px solid var(--stroke);
-  border-radius: var(--spacing-small);
   padding: var(--spacing-medium);
   color: var(--content);
   background: transparent;

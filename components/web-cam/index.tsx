@@ -9,9 +9,9 @@ import {
   DetectionResult,
   DetectionResultMetadata,
 } from "../detection-result";
-import Image from "next/image";
 
-const SIZE = 1024;
+const WEB_CAM_DIMENSIONS = 1024;
+const DETECTION_MODEL_EXPECTED_DIMENSIONS = 512;
 
 const detectObjects = ({
   canvasElement,
@@ -25,7 +25,12 @@ const detectObjects = ({
     const img = tf.browser.fromPixels(canvasElement);
 
     // Normalize.
-    const data = tf.expandDims(tf.image.resizeBilinear(img, [512, 512]));
+    const data = tf.expandDims(
+      tf.image.resizeBilinear(img, [
+        DETECTION_MODEL_EXPECTED_DIMENSIONS,
+        DETECTION_MODEL_EXPECTED_DIMENSIONS,
+      ])
+    );
     const input = tf.cast(data, "int32");
 
     // Run the inference.
@@ -62,14 +67,14 @@ const detectObjects = ({
 const MEDIA_STREAM_CONSTRAINTS = {
   video: {
     width: {
-      min: SIZE,
-      ideal: SIZE,
-      max: SIZE,
+      min: WEB_CAM_DIMENSIONS,
+      ideal: WEB_CAM_DIMENSIONS,
+      max: WEB_CAM_DIMENSIONS,
     },
     height: {
-      min: SIZE,
-      ideal: SIZE,
-      max: SIZE,
+      min: WEB_CAM_DIMENSIONS,
+      ideal: WEB_CAM_DIMENSIONS,
+      max: WEB_CAM_DIMENSIONS,
     },
   },
 };
@@ -77,8 +82,6 @@ const MEDIA_STREAM_CONSTRAINTS = {
 export const WebCam = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const videoRef = useRef<HTMLVideoElement>();
-  const imageRef = useRef<HTMLImageElement>(null);
-
   const [turns, setTurns] = useState<number[]>([]);
 
   const [detectionModel, setDetectionModel] = useState<TFLiteModel>();
@@ -101,28 +104,22 @@ export const WebCam = () => {
     });
   };
   const rollTotal = classifierResults.reduce((previous, result) => {
-    previous += result.actual!;
+    previous += result.actual ?? result.predicted;
     return previous;
   }, 0);
-
-  const hasVerifiedResults =
-    classifierResults.length &&
-    classifierResults.every((result) => !!result.actual);
+  const hasClassifierResults = !!classifierResults.length;
 
   const [videoStatus, setVideoStatus] = useState<
-    "enabled" | "disabled" | "sample"
-  >("disabled");
+    "loading" | "enabled" | "disabled"
+  >("loading");
 
   const [videoStream, setVideoStream] = useState<MediaStream>();
 
   useEffect(() => {
     let active = true;
-    load();
-    return () => {
-      active = false;
-    };
 
-    async function load() {
+    const loadTensorflowModels = async () => {
+      // Imported dynamically to avoid issues with server rendering.
       const { loadTFLiteModel, setWasmPath } = await import(
         "@tensorflow/tfjs-tflite"
       );
@@ -131,30 +128,66 @@ export const WebCam = () => {
         "https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-tflite@0.0.1-alpha.8/dist/"
       );
 
-      const cModel = await loadTFLiteModel("/classifier_model.tflite");
-      const dModel = await loadTFLiteModel("/detection_model.tflite");
+      const loadedClassifierModel = await loadTFLiteModel(
+        "/classifier_model.tflite"
+      );
+      const loadedDetectionModel = await loadTFLiteModel(
+        "/detection_model.tflite"
+      );
 
       if (!active) {
         return;
       }
 
-      setClassifierModel(cModel);
-      setDetectionModel(dModel);
-    }
+      setClassifierModel(loadedClassifierModel);
+      setDetectionModel(loadedDetectionModel);
+    };
+
+    loadTensorflowModels();
+
+    return () => {
+      active = false;
+    };
   }, []);
 
-  useEffect(() => {
-    // This doesn't appear to be cross-browser.
-    navigator.permissions.query({ name: "camera" as any }).then((res) => {
-      if (res.state == "granted") {
-        navigator.mediaDevices
-          .getUserMedia(MEDIA_STREAM_CONSTRAINTS)
-          .then((stream) => {
-            setVideoStream(stream);
-            setVideoStatus("enabled");
-          });
+  const setupWebCam = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia(
+        MEDIA_STREAM_CONSTRAINTS
+      );
+      setVideoStatus("enabled");
+      setVideoStream(stream);
+    } catch (error) {
+      if (
+        error instanceof DOMException &&
+        error.message === "Permission denied"
+      ) {
+        alert(
+          "Your webcam is blocked. Please allow access to your webcam in your browser settings and try again."
+        );
+      } else if (error instanceof Error) {
+        alert(
+          `An unexpected error occurred: "${error.message}". Please try again.`
+        );
       }
-    });
+    }
+  };
+
+  useEffect(() => {
+    const checkWebCamPermissionsAndSetup = async () => {
+      // This doesn't appear to be supported cross-browser (hence the cast), but works in chromium.
+      const result = await navigator.permissions.query({
+        name: "camera" as any,
+      });
+
+      if (result.state == "granted") {
+        setupWebCam();
+      } else {
+        setVideoStatus("disabled");
+      }
+    };
+
+    checkWebCamPermissionsAndSetup();
   }, []);
 
   const videoSetupRef = useCallback<RefCallback<HTMLVideoElement>>(
@@ -168,49 +201,31 @@ export const WebCam = () => {
     [videoStream]
   );
 
-  const handleClick = () => {
-    const sourceMedia = videoRef.current || imageRef.current;
+  const handleCaptureClick = () => {
+    const sourceMedia = videoRef.current;
 
     if (canvasRef.current && sourceMedia && classifierModel && detectionModel) {
       // Capture the current video frame onto the canvas.
       const canvasContext = canvasRef.current.getContext("2d")!;
-      canvasContext.drawImage(sourceMedia, 0, 0, SIZE, SIZE);
+      canvasContext.drawImage(
+        sourceMedia,
+        0,
+        0,
+        WEB_CAM_DIMENSIONS,
+        WEB_CAM_DIMENSIONS
+      );
 
       // Detect the objects and their bounding boxes.
       const results = detectObjects({
         canvasElement: canvasRef.current,
         detectionModel,
       });
-
-      // Draw the bounding boxes.
-      results.forEach((result) => {
-        const { xmin, ymin, xmax, ymax } = result.boundingBox;
-
-        canvasContext.strokeStyle = "#fbf9f7";
-        canvasContext.lineWidth = 4;
-        canvasContext.strokeStyle;
-        canvasContext.strokeRect(
-          xmin * SIZE - 6,
-          ymin * SIZE - 6,
-          (xmax - xmin) * SIZE + 12,
-          (ymax - ymin) * SIZE + 12
-        );
-      });
-
       setDetectionResults(results);
     }
   };
 
-  const handleAllowAccess = async () => {
-    const stream = await navigator.mediaDevices.getUserMedia(
-      MEDIA_STREAM_CONSTRAINTS
-    );
-    setVideoStatus("enabled");
-    setVideoStream(stream);
-  };
-
-  const handleLoadSample = () => {
-    setVideoStatus("sample");
+  const handleAllowAccess = () => {
+    setupWebCam();
   };
 
   const handleSaveRoll = () => {
@@ -225,56 +240,16 @@ export const WebCam = () => {
     }
   };
 
-  const showSidebar = videoStatus === "sample" || videoStatus === "enabled";
+  const videoEnabled = videoStatus === "enabled";
   const renderWebCam = () => {
     switch (videoStatus) {
-      case "sample":
-        return (
-          <>
-            <div className={styles.sampleImage}>
-              <Image
-                src="/dice-5-1.jpg"
-                alt="dice sample"
-                sizes="1024px"
-                fill
-                ref={imageRef}
-              />
-            </div>
-            <button
-              type="button"
-              onClick={handleClick}
-              className={styles.capture}
-            >
-              Capture
-            </button>
-          </>
-        );
       case "enabled":
         return (
-          <>
-            <video
-              ref={videoSetupRef}
-              className={styles.webCam}
-              id="webcam-video"
-            />
-            {hasVerifiedResults ? (
-              <button
-                type="button"
-                onClick={handleSaveRoll}
-                className={styles.capture}
-              >
-                Save roll and next turn
-              </button>
-            ) : (
-              <button
-                type="button"
-                onClick={handleClick}
-                className={styles.capture}
-              >
-                Capture
-              </button>
-            )}
-          </>
+          <video
+            ref={videoSetupRef}
+            className={styles.webCam}
+            id="webcam-video"
+          />
         );
       case "disabled":
         return (
@@ -290,21 +265,16 @@ export const WebCam = () => {
               </button>{" "}
               to your webcam to get started.
             </p>
-            <p>
-              📷 Or,{" "}
-              <button
-                type="button"
-                onClick={handleLoadSample}
-                className={styles.inlineButton}
-              >
-                load a sample image
-              </button>{" "}
-              to see how it works.
-            </p>
+          </div>
+        );
+      case "loading":
+        return (
+          <div className={styles.webCamSetup}>
+            <p>Initializing...</p>
           </div>
         );
       default:
-        const _never: never = videoStatus;
+        const _exhaustiveCheck: never = videoStatus;
         break;
     }
   };
@@ -313,31 +283,49 @@ export const WebCam = () => {
     <div className={styles.container}>
       <div className={styles.contentContainer}>
         <div className={styles.webCamContainer}>{renderWebCam()}</div>
-        {showSidebar ? (
-          <div className={styles.previewContainer}>
-            <canvas
-              ref={canvasRef}
-              className={styles.preview}
-              width="1024px"
-              height="1024px"
-            />
-            {hasVerifiedResults ? (
-              <div>
-                Total value: <strong>{rollTotal}</strong>
-              </div>
-            ) : null}
-            {detectionResults.map((result, index) => (
-              <DetectionResult
-                result={result}
-                key={index}
-                canvas={canvasRef.current!}
-                classifierModel={classifierModel!}
-                classifierResult={classifierResults[index]}
-                setClassifierResult={(result) =>
-                  setClassifierResultsAtIndex(index, result)
-                }
+        {videoEnabled ? (
+          <div className={styles.sidebar}>
+            <button
+              type="button"
+              onClick={handleCaptureClick}
+              className={styles.capture}
+            >
+              Capture
+            </button>
+            <div className={styles.previewContainer}>
+              <canvas
+                ref={canvasRef}
+                className={styles.preview}
+                width="1024px"
+                height="1024px"
               />
-            ))}
+              {detectionResults.map((result, index) => (
+                <DetectionResult
+                  result={result}
+                  key={index}
+                  canvas={canvasRef.current!}
+                  classifierModel={classifierModel!}
+                  classifierResult={classifierResults[index]}
+                  setClassifierResult={(result) =>
+                    setClassifierResultsAtIndex(index, result)
+                  }
+                />
+              ))}
+            </div>
+            {hasClassifierResults ? (
+              <>
+                <div>
+                  Total value: <strong>{rollTotal}</strong>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleSaveRoll}
+                  className={styles.capture}
+                >
+                  Save roll and next turn
+                </button>
+              </>
+            ) : null}
           </div>
         ) : null}
       </div>

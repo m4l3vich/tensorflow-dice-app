@@ -2,6 +2,8 @@ import { RefCallback, useCallback, useState } from "react";
 import * as tf from "@tensorflow/tfjs-core";
 import type { TFLiteModel } from "@tensorflow/tfjs-tflite";
 import styles from "../../styles/DetectionResult.module.css";
+import { Die } from "../die";
+import { Class, CLASSES } from "../../types";
 
 const SIZE = 1024;
 
@@ -14,19 +16,6 @@ export interface DetectionResultMetadata {
   };
   score: number;
 }
-
-const CLASSES = [5, 4, 1, 6, 3, 2] as const;
-
-const CLASS_FORMATTED = {
-  1: "one",
-  2: "two",
-  3: "three",
-  4: "four",
-  5: "five",
-  6: "six",
-};
-
-export type Class = typeof CLASSES[number];
 
 export interface ClassifierResultMetadata {
   predicted: Class;
@@ -120,57 +109,18 @@ export const DetectionResult = ({
     <div className={styles.container}>
       {predictedNumber ? (
         <span className={styles.predictedNumber}>
-          Predicted: <strong>{predictedNumber}</strong>
-          {classifierResult?.actual ? (
-            <>
-              , Actual: <strong>{classifierResult.actual}</strong>
-            </>
-          ) : null}
+          <Die
+            onClick={(value) =>
+              setClassifierResult({
+                predicted: predictedNumber,
+                actual: value,
+              })
+            }
+            currentValue={classifierResult?.actual ?? predictedNumber}
+          />
         </span>
       ) : null}
       <canvas ref={canvasRef} className={styles.detection} />
-      {predictedNumber ? (
-        <div className={styles.predictionConfirmationContainer}>
-          {wrong ? (
-            <div>
-              {Object.entries(CLASS_FORMATTED).map(([key, value]) => {
-                return (
-                  <button
-                    type="button"
-                    key={key}
-                    onClick={() => {
-                      setClassifierResult({
-                        predicted: predictedNumber,
-                        actual: Number(key) as Class,
-                      });
-                      setWrong(false);
-                    }}
-                  >
-                    {value}
-                  </button>
-                );
-              })}
-            </div>
-          ) : (
-            <>
-              <button type="button" onClick={() => setWrong(true)}>
-                ❌ Wrong
-              </button>
-              <button
-                type="button"
-                onClick={() =>
-                  setClassifierResult({
-                    predicted: predictedNumber,
-                    actual: predictedNumber,
-                  })
-                }
-              >
-                ✅ Correct
-              </button>
-            </>
-          )}
-        </div>
-      ) : null}
     </div>
   );
 };
