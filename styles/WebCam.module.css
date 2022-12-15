@@ -8,6 +8,13 @@
   gap: var(--spacing-medium);
 }
 
+@media screen and (max-width: 720px) {
+  .contentContainer {
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr 1fr;
+  }
+}
+
 .webCamContainer {
   display: flex;
   flex-direction: column;
