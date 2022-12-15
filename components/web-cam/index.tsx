@@ -172,12 +172,19 @@ export const WebCam = () => {
         alert(
           `An unexpected error occurred: "${error.message}". Please try again.`
         );
+      } else {
+        throw error;
       }
     }
   };
 
   useEffect(() => {
     const checkWebCamPermissionsAndSetup = async () => {
+      if (!("permissions" in navigator)) {
+        setVideoStatus("disabled");
+        return;
+      }
+
       // This doesn't appear to be supported cross-browser (hence the cast), but works in chromium.
       const result = await navigator.permissions.query({
         name: "camera" as any,
