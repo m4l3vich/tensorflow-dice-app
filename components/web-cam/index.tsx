@@ -78,6 +78,7 @@ const MEDIA_STREAM_CONSTRAINTS = {
       max: WEB_CAM_DIMENSIONS,
     },
   },
+  facingMode: "back"
 };
 
 export const WebCam = () => {
@@ -206,6 +207,7 @@ export const WebCam = () => {
         node.srcObject = videoStream;
         node.autoplay = true;
         node.playsInline = true;
+        node.muted = true;
         videoRef.current = node;
       }
     },
