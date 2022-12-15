@@ -35,6 +35,7 @@
 .webCam {
   border: 1px solid var(--stroke);
   background: var(--surface);
+  width: 100%;
 }
 
 .webCamSetup {

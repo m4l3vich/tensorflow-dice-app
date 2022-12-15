@@ -78,7 +78,7 @@ const MEDIA_STREAM_CONSTRAINTS = {
       max: WEB_CAM_DIMENSIONS,
     },
   },
-  facingMode: "back"
+  facingMode: "environment"
 };
 
 export const WebCam = () => {
