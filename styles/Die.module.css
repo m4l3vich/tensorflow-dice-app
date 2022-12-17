@@ -10,7 +10,8 @@
   will-change: transform;
 }
 
-.button:hover {
+.button:hover,
+.button:focus {
   transform: scale(1);
 }
 

@@ -10,6 +10,7 @@ import {
   DetectionResultMetadata,
 } from "../detection-result";
 import { Die } from "../die";
+import { Button } from "../button";
 
 const WEB_CAM_DIMENSIONS = 1024;
 const DETECTION_MODEL_EXPECTED_DIMENSIONS = 512;
@@ -77,7 +78,7 @@ const MEDIA_STREAM_CONSTRAINTS = {
       ideal: WEB_CAM_DIMENSIONS,
       max: WEB_CAM_DIMENSIONS,
     },
-    facingMode: "environment"
+    facingMode: "environment",
   },
 };
 
@@ -181,13 +182,14 @@ export const WebCam = () => {
 
   useEffect(() => {
     const checkWebCamPermissionsAndSetup = async () => {
+      // Not all browsers support checking permissions so automatic setup.
       if (!("permissions" in navigator)) {
         setVideoStatus("disabled");
         return;
       }
 
-      // This doesn't appear to be supported cross-browser (hence the cast), but works in chromium.
       const result = await navigator.permissions.query({
+        // This isn't supported cross-browser (hence the cast).
         name: "camera" as any,
       });
 
@@ -204,10 +206,15 @@ export const WebCam = () => {
   const videoSetupRef = useCallback<RefCallback<HTMLVideoElement>>(
     async (node) => {
       if (videoStream && node && !node.srcObject) {
+        // Connect the webcam stream to the video element.
         node.srcObject = videoStream;
         node.autoplay = true;
+
+        // These attributes are required to work on iOS.
         node.playsInline = true;
         node.muted = true;
+
+        // Manually set the video React ref since this callback is passed as the ref.
         videoRef.current = node;
       }
     },
@@ -301,23 +308,17 @@ export const WebCam = () => {
         <div className={styles.webCamContainer}>{renderWebCam()}</div>
         {videoEnabled ? (
           <div className={styles.sidebar}>
-            <button
-              type="button"
+            <Button
               onClick={handleCaptureClick}
-              className={styles.capture}
             >
               Capture roll
-            </button>
+            </Button>
             <div className={styles.dynamicContent}>
               {hasClassifierResults ? (
                 <>
-                  <button
-                    type="button"
-                    onClick={handleSaveRoll}
-                    className={styles.save}
-                  >
+                  <Button onClick={handleSaveRoll} variant="inverted">
                     Save roll
-                  </button>
+                  </Button>
                   <p className={styles.totalValue}>
                     Roll total: <strong>{rollTotal}</strong>
                   </p>

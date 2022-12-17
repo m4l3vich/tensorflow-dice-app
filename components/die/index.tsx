@@ -13,6 +13,7 @@ export const Die = ({ currentValue, transition }: DieProps) => {
       className={classnames(styles.die, styles[`rotate${currentValue}`], {
         [styles.transition]: transition,
       })}
+      role="presentation"
     >
       <div className={classnames(styles.face, styles.faceOne)}>
         <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
@@ -71,7 +72,11 @@ export const DieButton = ({ currentValue, onClick }: Props) => {
   const nextValue = ((currentValue % 6) + 1) as Class;
 
   return (
-    <button className={styles.button} onClick={() => onClick(nextValue)}>
+    <button
+      className={styles.button}
+      onClick={() => onClick(nextValue)}
+      aria-label={`current die value is ${currentValue}, click to change it to ${nextValue}`}
+    >
       <Die currentValue={currentValue} transition />
     </button>
   );
