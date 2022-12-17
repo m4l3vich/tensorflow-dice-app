@@ -11,7 +11,6 @@
 @media screen and (max-width: 720px) {
   .contentContainer {
     grid-template-columns: 1fr;
-    grid-template-rows: 1fr 1fr;
   }
 }
 
@@ -31,6 +30,12 @@
 
 .dynamicContent {
   min-height: 280px;
+}
+
+@media screen and (max-width: 720px) {
+  .dynamicContent {
+    min-height: auto;
+  }
 }
 
 .previewContainer {

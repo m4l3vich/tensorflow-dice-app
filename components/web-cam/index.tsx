@@ -1,6 +1,4 @@
 import { RefCallback, useCallback, useEffect, useRef, useState } from "react";
-import styles from "../../styles/WebCam.module.css";
-
 import "@tensorflow/tfjs-backend-cpu";
 import * as tf from "@tensorflow/tfjs-core";
 import type { TFLiteModel } from "@tensorflow/tfjs-tflite";
@@ -11,6 +9,7 @@ import {
 } from "../detection-result";
 import { Die } from "../die";
 import { Button } from "../button";
+import styles from "../../styles/WebCam.module.css";
 
 const WEB_CAM_DIMENSIONS = 1024;
 const DETECTION_MODEL_EXPECTED_DIMENSIONS = 512;
@@ -308,11 +307,7 @@ export const WebCam = () => {
         <div className={styles.webCamContainer}>{renderWebCam()}</div>
         {videoEnabled ? (
           <div className={styles.sidebar}>
-            <Button
-              onClick={handleCaptureClick}
-            >
-              Capture roll
-            </Button>
+            <Button onClick={handleCaptureClick}>Capture roll</Button>
             <div className={styles.dynamicContent}>
               {hasClassifierResults ? (
                 <>
