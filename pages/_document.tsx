@@ -6,7 +6,7 @@ export default function Document() {
       <Head>
         <meta
           name="description"
-          content="An app to track Catan dice rolls and rounds"
+          content="An app to track dice rolls across rounds"
         />
         <link rel="icon" href="/favicon.ico" />
         <link

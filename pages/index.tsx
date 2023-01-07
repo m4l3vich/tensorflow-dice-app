@@ -6,11 +6,11 @@ export default function Home() {
   return (
     <>
       <Head>
-        <title>Catan tracker</title>
+        <title>Dice tracker</title>
       </Head>
 
       <nav className={styles.nav}>
-        <h1>🎲 Catan tracker</h1>
+        <h1>🎲 Dice tracker</h1>
       </nav>
 
       <main className={styles.main}>
