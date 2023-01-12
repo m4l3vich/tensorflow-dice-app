@@ -5,8 +5,30 @@
 }
 
 .nav {
-  padding: var(--spacing-medium);
+  padding: var(--spacing-medium) var(--spacing-large);
   border-bottom: 1px solid var(--stroke);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.navLink {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xsmall);
+  margin: calc(-1 * var(--spacing-small));
+  padding: var(--spacing-small);
+  border-radius: var(--spacing-small);
+  transition: background 100ms ease;
+}
+
+.navLink:hover {
+  background: var(--die);
+}
+
+.navLink span {
+  font-size: var(--font-size-small);
+  font-weight: 500;
 }
 
 .nav h1 {
