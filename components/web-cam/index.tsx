@@ -160,7 +160,7 @@ export const WebCam = () => {
 
     for (const device of devices) {
       if (device.kind !== 'videoinput') continue
-      devicesInfo.push({ label: deviceInfo.label, id: deviceInfo.deviceId })
+      devicesInfo.push({ label: device.label, id: device.deviceId })
     }
 
     const devicesListStr = devicesInfo.map((e, i) => `${i + 1}. ${e.label}`).join('\n')
