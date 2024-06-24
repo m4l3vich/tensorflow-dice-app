@@ -164,10 +164,12 @@ export const WebCam = () => {
       devicesInfo.push({ label: device.label, id: device.deviceId })
     }
 
-    const devicesListStr = devicesInfo.map((e, i) => `${i + 1}. ${e.label}`).join('\n')
-    const choice = Number((window.prompt(`Select webcam:\n${devicesListStr}`) ?? '').trim())
-
-    const deviceId = isNaN(choice) ? devicesInfo[0].id : devicesInfo[choice - 1].id
+    if (devicesInfo.length > 1) {
+      const devicesListStr = devicesInfo.map((e, i) => `${i + 1}. ${e.label}`).join('\n')
+      const choice = Number((window.prompt(`Select webcam:\n${devicesListStr}`) ?? '').trim())
+  
+      const deviceId = isNaN(choice) ? devicesInfo[0].id : devicesInfo[choice - 1].id 
+    }
     
     try {
       const stream = await navigator.mediaDevices.getUserMedia(
