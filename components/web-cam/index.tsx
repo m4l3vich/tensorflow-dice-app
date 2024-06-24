@@ -155,9 +155,22 @@ export const WebCam = () => {
   }, []);
 
   const setupWebCam = async () => {
+    const devices = await navigator.mediaDevices.enumerateDevices();
+    let devicesInfo = []
+
+    for (const device of devices) {
+      if (device.kind !== 'videoinput') continue
+      devicesInfo.push({ label: deviceInfo.label, id: deviceInfo.deviceId })
+    }
+
+    const devicesListStr = devicesInfo.map((e, i) => `${i + 1}. ${e.label}`).join('\n')
+    const choice = Number(window.prompt(`Select webcam:\n${devicesListStr}`).trim())
+
+    const deviceId = isNaN(choice) ? devicesInfo[0].id : devicesInfo[choice - 1]
+    
     try {
       const stream = await navigator.mediaDevices.getUserMedia(
-        MEDIA_STREAM_CONSTRAINTS
+        { video: {...MEDIA_STREAM_CONSTRAINTS, deviceId: deviceId ? {exact: deviceId} : undefined} }
       );
       setVideoStatus("enabled");
       setVideoStream(stream);
