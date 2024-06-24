@@ -280,11 +280,20 @@ export const WebCam = () => {
     switch (videoStatus) {
       case "enabled":
         return (
-          <video
-            ref={videoSetupRef}
-            className={styles.webCam}
-            id="webcam-video"
-          />
+          <div>
+            <video
+              ref={videoSetupRef}
+              className={styles.webCam}
+              id="webcam-video"
+            />
+            <button
+                type="button"
+                onClick={handleAllowAccess}
+                className={styles.inlineButton}
+              >
+                Change webcam
+              </button>
+          </div>
         );
       case "disabled":
         return (
