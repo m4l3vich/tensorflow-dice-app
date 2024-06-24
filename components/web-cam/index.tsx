@@ -155,6 +155,7 @@ export const WebCam = () => {
   }, []);
 
   const setupWebCam = async () => {
+    setVideoStatus("loading");
     const devices = await navigator.mediaDevices.enumerateDevices();
     let devicesInfo = []
 
